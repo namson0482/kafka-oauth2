@@ -1,0 +1,72 @@
+version: '3.5'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:19.0.1
+    container_name: keycloak
+    ports:
+      -  "8080:8080"   
+    networks:
+      - my_network
+    command: 
+      - start-dev 
+      - --import-realm  
+    volumes:
+      - ./kafka/keycloak/realms/demo-realm.json:/opt/keycloak/data/import/realm.json
+    environment:
+      KEYCLOAK_ADMIN: admin 
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+  zookeeper:
+    image: namson0482/zookeeper:1.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - my_network  
+    depends_on:
+      - keycloak
+    
+  kafka:
+    image: namson0482/kafka-oauth2-cc-wav:1.0
+    build: 
+      context: kafka
+      dockerfile: Dockerfile-all
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - my_network
+    links:
+      - zookeeper:zookeeper
+      - keycloak:keycloak
+    depends_on:
+      - zookeeper
+      - keycloak
+    environment:
+      # KAFKA Configuration
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      EXTRA_ARGS: "-Djava.security.auth.login.config=/opt/kafka/config/kafka_server_jaas.conf"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_PLAINTEXT:SASL_PLAINTEXT
+      KAFKA_LISTENERS: "SASL_PLAINTEXT://:9092"
+      KAFKA_ADVERTISED_LISTENERS: "SASL_PLAINTEXT://kafka:9092"
+      # KAFKA Security
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_PLAINTEXT
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: OAUTHBEARER
+      KAFKA_SASL_ENABLED_MECHANISMS: OAUTHBEARER
+      KAFKA_CREATE_TOPICS: "topic_default:1:1"
+      # OAuth Configuration
+      OAUTH_WITH_SSL: "false"
+      OAUTH_LOGIN_SERVER : "keycloak:8080"
+      OAUTH_LOGIN_ENDPOINT : "/realms/demo/protocol/openid-connect/token"
+      OAUTH_LOGIN_GRANT_TYPE: "client_credentials"
+      OAUTH_LOGIN_SCOPE: "email"
+      # Format: Basic encodeBase64(client_id:client_secret)
+      OAUTH_AUTHORIZATION : "Basic a2Fma2EtYnJva2VyOmthZmthLWJyb2tlci1zZWNyZXQ="
+      OAUTH_INTROSPECT_SERVER : "keycloak:8080"
+      OAUTH_INTROSPECT_ENDPOINT : "/realms/demo/protocol/openid-connect/token/introspect"
+      OAUTH_INTROSPECT_AUTHORIZATION : "Basic a2Fma2EtYnJva2VyOmthZmthLWJyb2tlci1zZWNyZXQ="
+
+networks:
+    my_network:
+        driver: bridge

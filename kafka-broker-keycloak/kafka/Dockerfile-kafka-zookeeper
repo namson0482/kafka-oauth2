@@ -1,0 +1,8 @@
+FROM wurstmeister/kafka:latest
+
+RUN mkdir /opt/kafka/addons
+COPY libs/kafka* /opt/kafka/libs/
+COPY config/* /opt/kafka/config/
+COPY start-kafka-zookeeper.sh /start.sh
+
+CMD ["/bin/bash", "/start.sh"]
