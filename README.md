@@ -46,4 +46,5 @@ Step 6: Open IDE such as Intellij or Eclipse to open project kafka-oauth2-client
 
 ## Build your own kafka-oauth2-server-1.0.0.jar
 
-You use any IDE to open project kafka-oauth2-wav and use maven command to compile and build.
+You use any IDE to open project kafka-oauth2-wav and use maven command to compile and build then you copy new jar file into kafka-broker-keycloak/kafka/libs then execute docker-compose command above again. 
+Apache Kafka will use your latest jar file.
