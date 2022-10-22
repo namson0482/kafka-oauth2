@@ -19,7 +19,7 @@ Add oauth-authorizer dependency in your `pom.xml` file
 
     <dependency>
          <groupId>com.waverley</groupId>
-         <artifactId>kafka-oauth2-wav</artifactId>
+         <artifactId>kafka-oauth2-server</artifactId>
          <version>1.0.0</version>
     </dependency>
 
