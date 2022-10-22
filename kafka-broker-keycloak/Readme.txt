@@ -15,15 +15,18 @@ Step 2: Unzip file, go to your folder kafka-broker-keycloak and execute one out 
 
 Step 3: open http://keycloak:8080 and login by admin/admin to go to realm demo to view client id
 
-Step 4: 
-	- Download ReadyAPI from URL:
-	https://s3.us-east-1.amazonaws.com/readyapi.dev/readyapi-3.42.0-SNAPSHOT-936059b/ReadyAPI-x64-3.42.0-SNAPSHOT.exe?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA36R6UDHHBP5Q3BRY%2F20221021%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20221021T131108Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=dbd9984ec85d770acd2a1b41786825c1a359c8f8bfb6bbd13b0c19c6f3dbd9df
-	
-	- Open ReadyAPI app and import a project from example and check Apache Kafka OAuth 2
+Step 4: get an access token by postman with values below:
+    Grant Type: client credential
+    http://keycloak:8080/realms/demo/protocol/openid-connect/token
+    client id: kafka-broker
+    client secret: kafka-broker-secret
+    scope: email
 
-Further information - URL get Access Tokens from Keycloak:
-    - http://keycloak:8080/realms/demo/protocol/openid-connect/token
-    - client id: kafka-broker
-    - client secret: kafka-broker-secret
-Pay Attention: This guideline is only effective  for scenario: All components will run on one computer only. If you want to run with other scenario then we need to change configuration
-DONE!!!
+Step 5:
+    - Mac/Linux use a command: export OAUTH2_ACCESS_TOKEN=<ACCESS_TOKEN_VALUE>
+    - Window use a command: set OAUTH2_ACCESS_TOKEN=<ACCESS_TOKEN_VALUE>
+    - ACCESS_TOKEN_VALUE: take by postman above
+
+Step 6: Open IDE such as Intellij or Eclipse to open project kafka-oauth2-client
+    - Run main method in class ProducerOAuth
+    - Run main method in class ConsumerOAuth
